@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn, getSession } from "next-auth/react";
+import Link from "next/link";
+
 
 export default function LoginPage() {
   const [form, setForm] = useState({
@@ -110,6 +112,7 @@ export default function LoginPage() {
               value={form.password}
               onChange={handleChange}
               placeholder="Password"
+              
               required
               className="w-full mb-4 p-2 rounded"
             />
@@ -119,6 +122,15 @@ export default function LoginPage() {
         <button className="bg-blue-700 hover:bg-blue-900 text-white w-full py-2 rounded font-medium">
           Login
         </button>
+        <p className=" pl-24 mt-4 text-base text-gray-600">
+          Not registered?{" "}
+          <a
+            href="/"
+            className="text-blue-800 underline hover:underline font-medium"
+          >
+            Sign up here
+          </a>
+        </p>
       </form>
     </div>
   );

@@ -26,7 +26,7 @@ export default function RegisterPage() {
 
     try {
       const res = await axios.post("/api/auth/register", form);
-      
+
       if (res.status === 200 || res.status === 201) {
         alert("Registered successfully!");
         router.push("/login");
@@ -101,6 +101,24 @@ export default function RegisterPage() {
             className="w-full mb-3 p-2 rounded"
           />
         )}
+        {form.role === "worker" && (
+          <div>
+            <label>Specialisation</label>
+            <select name="specialisation" onChange={handleChange} required>
+              <option value="">-- Select Specialisation --</option>
+              <option value="Plumbing">Plumbing</option>
+              <option value="Electrical">Electrical</option>
+              <option value="Cleaning">Cleaning</option>
+              <option value="Carpentry">Carpentry</option>
+              <option value="Pest Control">Pest Control</option>
+              <option value="Painting">Painting</option>
+              <option value="HVAC">HVAC (Heating, Ventilation, AC)</option>
+              <option value="Gardening">Gardening</option>
+              <option value="Security">Security</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        )}
 
         <input
           name="contact"
@@ -134,5 +152,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-
-
