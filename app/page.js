@@ -103,8 +103,14 @@ export default function RegisterPage() {
         )}
         {form.role === "worker" && (
           <div>
-            <label>Specialisation</label>
-            <select name="specialisation" onChange={handleChange} required>
+            <label className="block mb-1 font-medium">Specialisation</label>
+            <select
+              name="specialisation"
+              onChange={handleChange}
+              value={form.specialisation || ""}
+              required={form.role === "worker"}
+              className="w-full border rounded px-3 py-2"
+            >
               <option value="">-- Select Specialisation --</option>
               <option value="Plumbing">Plumbing</option>
               <option value="Electrical">Electrical</option>

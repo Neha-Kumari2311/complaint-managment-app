@@ -120,7 +120,7 @@ export default function ManagerDashboard() {
                     <td className="p-2 capitalize">{c.status}</td>
                     <td className="p-2">
                       <select
-                        value={assignmentInputs[c.id]?.priority || "Medium"}
+                        value={assignmentInputs[c.id]?.priority }
                         onChange={(e) =>
                           setAssignmentInputs((prev) => ({
                             ...prev,
@@ -135,7 +135,7 @@ export default function ManagerDashboard() {
                         }
                         className="border px-2 py-1 rounded"
                       >
-                        <option value="">--</option>
+                        <option  value="">--</option>
                         <option value="Low">Low</option>
                         <option value="Medium">Medium</option>
                         <option value="High">High</option>
