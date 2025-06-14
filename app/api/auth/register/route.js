@@ -36,7 +36,7 @@ export async function POST(req) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // ✅ Store the password too
+    // Store the password too
     const [result] = await db.query(
       `INSERT INTO users (id, name, email, password, flat_no, contact_no, role,specialisation) VALUES (UUID(), ?, ?, ?, ?, ?, ?,?)`,
       [name, email, hashedPassword, flatNumber || "", contact, role,specialisation || null]

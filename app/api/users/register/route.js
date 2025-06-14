@@ -24,7 +24,7 @@ export const authOptions = {
 
           const user = rows[0];
 
-          // **⚠️ For real apps, hash & compare passwords!**
+          //  hash & compare passwords!**
           if (credentials.password !== user.password) {
             throw new Error("Invalid password");
           }

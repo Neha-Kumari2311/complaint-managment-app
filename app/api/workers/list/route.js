@@ -20,7 +20,7 @@ export async function GET() {
       "SELECT id, name, specialisation FROM users WHERE role = 'worker'"
     );
 
-    return Response.json(rows); // Array of workers
+    return Response.json(rows); 
   } catch (err) {
     console.error("❌ Worker list fetch error:", err);
     return new Response("Internal Server Error", { status: 500 });
