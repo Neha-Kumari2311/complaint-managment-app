@@ -9,6 +9,19 @@ export default function TokenDashboard() {
   const router = useRouter();
   const [tokens, setTokens] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [rewards, setRewards] = useState([]);
+
+  
+  const fetchRewards = async () => {
+  try {
+    const res = await axios.get("/api/rewards");
+    setRewards(res.data || []);
+  } catch (err) {
+    console.error("Error fetching rewards", err);
+    alert("Could not load rewards");
+  }
+};
+
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -17,13 +30,14 @@ export default function TokenDashboard() {
       router.push("/");
     } else {
       fetchTokenBalance();
+       fetchRewards();
     }
   }, [status, session]);
 
   const fetchTokenBalance = async () => {
     try {
-      const res = await axios.get("/api/test/tokens");
-      setTokens(res.data.tokens);
+      const res = await axios.get("/api/tokens/balance");
+      setTokens(res.data.totalTokens || 0);
     } catch (err) {
       console.error("Error fetching tokens:", err);
     } finally {
@@ -31,23 +45,54 @@ export default function TokenDashboard() {
     }
   };
 
-  const handleRedeem = () => {
-    alert("Redeem feature coming soon!");
+  const handleRedeem = async (tokensToRedeem, rewardName) => {
+    try {
+      const res = await axios.post("/api/tokens/redeem", {
+        tokensToRedeem,
+        rewardName,
+      });
+
+      alert(`Successfully redeemed: ${rewardName}`);
+      // Update token balance
+      setTokens((prev) => prev - tokensToRedeem);
+    } catch (err) {
+      console.error("Redeem failed:", err);
+      alert(err.response?.data?.message || "Redeem failed");
+    }
   };
 
   if (loading) return <div className="text-center mt-10">Loading...</div>;
 
   return (
-    <div className="min-h-screen p-6 bg-indigo-100">
-      <div className="bg-white shadow-lg rounded-xl p-8 w-full max-w-md mx-auto text-center">
-        <h1 className="text-2xl font-bold mb-4 text-indigo-900">Token Balance</h1>
-        <p className="text-4xl font-extrabold text-green-600 mb-4">{tokens ?? 0} 🪙</p>
-        <button
-          onClick={handleRedeem}
-          className="px-6 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
-        >
-          Redeem Rewards
-        </button>
+    <div className="mt-6">
+      <h2 className="text-xl font-semibold mb-2 text-indigo-800">
+        Available Rewards
+      </h2>
+      <div className="space-y-4">
+        {rewardsList.map((reward) => (
+          <div
+            key={reward.id}
+            className="flex items-center justify-between bg-gray-100 px-4 py-2 rounded shadow"
+          >
+            <div>
+              <h3 className="text-lg font-bold text-gray-800">{reward.name}</h3>
+              <p className="text-sm text-gray-600">
+                {reward.tokens} 🪙 required
+              </p>
+            </div>
+            <button
+              onClick={() => handleRedeem(reward.tokens, reward.name)}
+              disabled={tokens < reward.tokens}
+              className={`px-4 py-1 rounded text-white ${
+                tokens >= reward.tokens
+                  ? "bg-green-600 hover:bg-green-700"
+                  : "bg-gray-400 cursor-not-allowed"
+              }`}
+            >
+              Redeem
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );

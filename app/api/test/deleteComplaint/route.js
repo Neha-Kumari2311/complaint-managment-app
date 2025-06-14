@@ -25,7 +25,7 @@ export async function DELETE(req) {
     });
 
     await db.execute("DELETE FROM complaints WHERE id = ?", [complaintId]);
-
+    
     return new Response("Deleted successfully", { status: 200 });
   } catch (err) {
     console.error("❌ DELETE ERROR:", err);

@@ -10,18 +10,20 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const userId=session.user.id;
+  console.log("Worker userId:", userId);
 
 
   try {
     const [rows] = await db.query(
-      "SELECT tokensEarned FROM tokens WHERE workerId = ?",
-      [session.user.id]
+      "SELECT SUM(tokensEarned) as totalTokens FROM tokens WHERE workerId = ?",
+      [userId]
     );
       console.log("Worker ID from session:", session.user.id);
 
-    const balance = rows?.tokensEarned || 0;
+    const totalTokens = rows[0]?.totalTokens || 0;
 
-    return NextResponse.json({ totalTokens: balance });
+    return NextResponse.json({ totalTokens });
   } catch (error) {
     console.error("Error fetching token balance:", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import QRScanner from "@/components/QRScanner";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { signOut } from "next-auth/react";
 
 export default function WorkerDashboard() {
   const { data: session, status } = useSession();
@@ -17,10 +18,12 @@ export default function WorkerDashboard() {
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
-    } else if (session?.user?.role !== "worker") {
+      return;
+    }
+
+    if (session?.user?.role !== "worker") {
       router.push("/");
-    } else {
-      fetchComplaints();
+      return;
     }
   }, [status, session]);
 
@@ -39,45 +42,92 @@ export default function WorkerDashboard() {
       setLoading(false);
     }
   };
+  useEffect(() => {
+    fetchComplaints();
+  }, []);
 
   const handleScanClick = (complaintId) => {
-    setScanningComplaintId(complaintId);
-    setShowScanner(true);
+    if (!showScanner && !scanningComplaintId) {
+      setScanningComplaintId(complaintId);
+      setShowScanner(true);
+    }
   };
 
-  const handleQRResult = async (result) => {
-    console.log("Scanned QR Result:", result.text);
+  // const handleQRResult = async (complaintIdFromQR) => {
+  //   console.log("Scanned ID:", complaintIdFromQR);
+  //   try {
+  //     const res = await axios.get(
+  //       `/api/test/get-complaint?Code=${complaintIdFromQR}`
+  //     );
+  //     const complaint = res.data;
 
-    if (!result) return;
+  //     if (!complaint) {
+  //       alert("Complaint not found or already resolved.");
+  //       return;
+  //     }
+
+  //     // ✅ Optionally match scanned complaint with currently assigned
+  //     const assignedComplaint = complaints.find(
+  //       (c) => c.id === complaintIdFromQR && c.status === "in progress"
+  //     );
+
+  //     if (!assignedComplaint) {
+  //       alert(
+  //         "Scanned QR does not match any 'in progress' complaint assigned to you."
+  //       );
+  //       return;
+  //     }
+
+  //     await axios.patch("/api/test/update-status", {
+  //       id: complaintIdFromQR,
+  //       status: "resolved",
+  //     });
+
+  //     alert("Complaint marked as resolved!");
+  //     fetchComplaints();
+  //   } catch (error) {
+  //     console.error("QR Scan Error:", error);
+  //     alert("Failed to resolve complaint. Try again.");
+  //   } finally {
+  //     setShowScanner(false);
+  //     setScanningComplaintId(null);
+  //   }
+  // };
+  const handleQRResult = async (scannedCode) => {
+    console.log("Scanned complaintCode:", scannedCode);
 
     try {
-      const complaintId = result.text?.trim();
-
-      if (!complaintId) {
-        alert("Invalid QR code scanned.");
-        return;
-      }
-
-      const res = await axios.get(`/api/test/getComplaint?id=${complaintId}`);
-
+      const res = await axios.get(
+        `/api/test/get-complaint?code=${scannedCode}`
+      );
       const complaint = res.data;
 
       if (!complaint) {
-        alert("Complaint not found or already resolved");
+        alert("Complaint not found or already resolved.");
         return;
       }
 
-      // Update complaint to resolved
+      // ✅ Ensure it's actually assigned to this worker and in progress
+      if (complaint.status !== "in progress") {
+        alert("Complaint is not in progress.");
+        return;
+      }
+
+      // ✅ Update status using complaint.id (not complaintCode anymore)
       await axios.patch("/api/test/update-status", {
-        id: complaintId,
+        id: complaint.id, // resolved by complaint.id
         status: "resolved",
+        priority: complaint.priority, 
       });
 
       alert("Complaint marked as resolved!");
-      fetchComplaints(); // Refresh complaints list
+      fetchComplaints(); // refresh table
     } catch (error) {
-      console.error("QR Scan Error:", error);
-      alert("Failed to resolve complaint. Try again.");
+      console.error("❌ QR Scan Error:", error);
+      alert(
+        error?.response?.data?.message ||
+          "Failed to resolve complaint. Try again."
+      );
     } finally {
       setShowScanner(false);
       setScanningComplaintId(null);
@@ -101,11 +151,27 @@ export default function WorkerDashboard() {
   }
 
   return (
-    <div className="min-h-screen p-6 bg-indigo-100">
+    <div className="min-h-screen p-6 bg-indigo-100 relative">
       <div className="bg-white shadow-lg rounded-xl p-8 w-full max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-6 text-blue-900">
           Worker Dashboard
         </h1>
+        <div className="mt-4 text-center">
+          <button
+            className="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2 rounded"
+            onClick={() => router.push("/worker/tokens")}
+          >
+            Go to Token Dashboard
+          </button>
+        </div>
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            className="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-900"
+          >
+            Logout
+          </button>
+        </div>
 
         {complaints.length === 0 ? (
           <p className="text-gray-600">No complaints assigned yet.</p>
@@ -170,24 +236,17 @@ export default function WorkerDashboard() {
           </div>
         )}
       </div>
-
       {showScanner && (
-        <QRScanner
-          onScan={handleQRResult}
-          onClose={() => {
-            setShowScanner(false);
-            setScanningComplaintId(null);
-          }}
-        />
+        <div className="fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center">
+          <QRScanner
+            onScan={handleQRResult}
+            onClose={() => {
+              setShowScanner(false);
+              setScanningComplaintId(null);
+            }}
+          />
+        </div>
       )}
-      <div className="mt-4 text-center">
-        <button
-          className="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2 rounded"
-          onClick={() => router.push("/worker/tokens")}
-        >
-          Go to Token Dashboard
-        </button>
-      </div>
     </div>
   );
 }

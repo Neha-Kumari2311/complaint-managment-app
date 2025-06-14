@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { db } from "@/lib/db";
+import { v4 as uuidv4 } from "uuid";
 
 export async function POST(req) {
   const session = await getServerSession(authOptions);
@@ -19,26 +20,23 @@ export async function POST(req) {
   try {
     const workerId = session.user.id;
 
-    // Fetch current balance
+    // Fetch current token balance
     const [result] = await db.query(
-      "SELECT tokensEarned FROM tokens WHERE workerId = ?",
+      "SELECT SUM(tokensEarned) as total FROM tokens WHERE workerId = ?",
       [workerId]
     );
 
-    const currentTokens = result?.[0]?.tokensEarned;
-
-    if (currentTokens === undefined) {
-      return NextResponse.json({ message: "Token data not found" }, { status: 404 });
-    }
+    const currentTokens = result?.[0]?.total || 0;
 
     if (tokensToRedeem > currentTokens) {
       return NextResponse.json({ message: "Not enough tokens" }, { status: 400 });
     }
 
-    // Deduct tokens
+    // Insert negative token entry to redeem
+    const redeemId = uuidv4();
     await db.query(
-      "UPDATE tokens SET tokensEarned = tokensEarned - ? WHERE workerId = ?",
-      [tokensToRedeem, workerId]
+      "INSERT INTO tokens (id, workerId, tokensEarned, updatedAt) VALUES (?, ?, ?, NOW())",
+      [redeemId, workerId, -tokensToRedeem]
     );
 
     return NextResponse.json({
@@ -50,4 +48,5 @@ export async function POST(req) {
     return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
+
 
