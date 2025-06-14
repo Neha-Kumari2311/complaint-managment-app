@@ -211,6 +211,7 @@ import { useState, useEffect } from "react";
 import axios from "@/lib/axios";
 import QRCode from "react-qr-code";
 import { signOut } from "next-auth/react";
+import toast from "react-hot-toast";
 
 export default function ResidentDashboard() {
   const [complaints, setComplaints] = useState([]);
@@ -227,6 +228,7 @@ export default function ResidentDashboard() {
         setComplaints(res.data);
       } catch (err) {
         console.error("Error fetching complaints:", err);
+        toast.error("Failed to fetch complaints.");
       }
     };
 
@@ -254,18 +256,21 @@ export default function ResidentDashboard() {
       const res = await axios.post("/api/test/createComplaint", formData);
       const result = res.data;
       setComplaints((prev) => [result, ...prev]);
-      alert(
-        `Complaint submitted successfully!\nComplaint Code: ${result.complaintCode}`
+
+      toast.success(
+        `Complaint submitted! Code: ${result.complaintCode}`,
+        { duration: 6000 }
       );
       setForm({ category: "", description: "", image: null });
     } catch (err) {
       console.error("Submit error:", err);
-      alert("Failed to submit complaint");
+      toast.error("Failed to submit complaint.");
     }
   };
 
   const handleDelete = async (id) => {
-    if (!id) return alert("Invalid complaint ID");
+    if (!id) return toast.error("Invalid complaint ID");
+
     const confirmed = window.confirm(
       "Are you sure you want to delete this complaint?"
     );
@@ -274,9 +279,10 @@ export default function ResidentDashboard() {
     try {
       await axios.delete(`/api/test/deleteComplaint?id=${id}`);
       setComplaints((prev) => prev.filter((c) => c.id !== id));
+      toast.success("Complaint deleted.");
     } catch (err) {
       console.error("Delete error:", err);
-      alert("Failed to delete complaint");
+      toast.error("Failed to delete complaint.");
     }
   };
 
@@ -297,10 +303,6 @@ export default function ResidentDashboard() {
 
         {/* Complaint Submission Form */}
         <div className="bg-white bg-opacity-90 backdrop-blur-md rounded-2xl shadow-xl p-6 mb-8 border border-[#d4f3ef]">
-          {/* <h2 className="text-2xl font-bold text-[#333] mb-6">
-            Submit a Complaint
-          </h2> */}
-
           <form onSubmit={handleSubmit} className="grid gap-6 sm:grid-cols-2">
             {/* Category */}
             <div className="col-span-2">
@@ -375,7 +377,7 @@ export default function ResidentDashboard() {
           <h1 className="text-4xl font-bold text-[#62baac]">
             Your Complaints
           </h1>
-          <br/>
+          <br />
           <div className="overflow-x-auto">
             <table className="w-full table-auto bg-white shadow rounded-xl overflow-hidden">
               <thead className="bg-[#e6f6f3] text-[#333]">
@@ -432,3 +434,4 @@ export default function ResidentDashboard() {
     </div>
   );
 }
+

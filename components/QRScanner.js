@@ -52,6 +52,7 @@
 
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { useEffect, useRef } from "react";
+import toast from "react-hot-toast";
 
 export default function QRScanner({ onScan, onClose }) {
   const scannerRef = useRef(null);
@@ -68,6 +69,7 @@ export default function QRScanner({ onScan, onClose }) {
     scanner.render(
       (decodedText) => {
         console.log("✅ QR Code Scanned:", decodedText);
+        toast.success("QR Code scanned successfully!");
         onScan(decodedText);
 
         // Clear and close only once
@@ -78,10 +80,12 @@ export default function QRScanner({ onScan, onClose }) {
           })
           .catch((err) => {
             console.warn("Clear error after scan:", err.message);
+            toast.error("Scanner clear failed.");
           });
       },
       (errorMessage) => {
         // Suppress continuous scanning noise
+        // Optionally, you could toast.error(errorMessage) for debugging
       }
     );
 
@@ -102,6 +106,7 @@ export default function QRScanner({ onScan, onClose }) {
               console.warn("Safe to ignore scanner cleanup error:", err.message);
             } else {
               console.error("Unexpected cleanup error:", err);
+              toast.error("Scanner cleanup error.");
             }
           });
       }
@@ -126,4 +131,5 @@ export default function QRScanner({ onScan, onClose }) {
     </div>
   );
 }
+
 

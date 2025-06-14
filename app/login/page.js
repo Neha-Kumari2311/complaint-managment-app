@@ -136,6 +136,7 @@
 // }
 "use client";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { FaUserShield, FaEnvelope, FaPhone, FaLock, FaHome } from "react-icons/fa";
@@ -148,7 +149,7 @@ export default function LoginPage() {
     flatNumber: "",
     contact: "",
   });
-  const [error, setError] = useState("");
+
   const router = useRouter();
 
   const handleChange = (e) => {
@@ -157,7 +158,6 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
 
     const res = await signIn("credentials", {
       ...form,
@@ -167,6 +167,8 @@ export default function LoginPage() {
     if (res.ok) {
       const sessionRes = await fetch("/api/auth/session");
       const session = await sessionRes.json();
+
+      toast.success("Login successful!");
 
       if (session?.user?.role === "resident") {
         router.push("resident/dashboard");
@@ -178,7 +180,7 @@ export default function LoginPage() {
         router.push("/");
       }
     } else {
-      setError(res.error || "Login failed. Please check your credentials.");
+      toast.error(res.error || "Login failed. Please check your credentials.");
     }
   };
 
@@ -195,13 +197,6 @@ export default function LoginPage() {
           <p className="text-gray-500 text-sm mt-1">Login to continue</p>
         </div>
 
-        {/* 🔴 Error Display */}
-        {error && (
-          <div className="bg-red-100 text-red-800 p-2 mb-4 rounded text-sm text-center">
-            {error}
-          </div>
-        )}
-
         {/* 👤 Role Selection */}
         <div className="mb-4">
           <select
@@ -213,8 +208,8 @@ export default function LoginPage() {
           >
             <option value="">Select Role</option>
             <option className="text-[#5b10a1]" value="resident">Resident</option>
-            <option  className="text-[#5b10a1]" value="manager">Manager</option>
-            <option  className="text-[#5b10a1]" value="worker">Worker</option>
+            <option className="text-[#5b10a1]" value="manager">Manager</option>
+            <option className="text-[#5b10a1]" value="worker">Worker</option>
           </select>
         </div>
 
@@ -295,4 +290,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
 

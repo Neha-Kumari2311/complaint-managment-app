@@ -224,7 +224,6 @@
 //     </div>
 //   );
 // }
-
 "use client";
 
 import { useSession } from "next-auth/react";
@@ -232,6 +231,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "@/lib/axios";
 import { signOut } from "next-auth/react";
+import { toast } from "react-hot-toast";
 
 export default function ManagerDashboard() {
   const { data: session, status } = useSession();
@@ -256,6 +256,7 @@ export default function ManagerDashboard() {
         setWorkers(workersRes.data);
       } catch (err) {
         console.error("Fetch error:", err);
+        toast.error("Failed to load data");
       }
     };
 
@@ -288,9 +289,11 @@ export default function ManagerDashboard() {
             : c
         )
       );
+
+      toast.success("Complaint assigned successfully!");
     } catch (err) {
       console.error("Assign error:", err);
-      alert("Assignment failed");
+      toast.error("Assignment failed");
     }
   };
 
@@ -377,9 +380,9 @@ export default function ManagerDashboard() {
                       className="border rounded px-2 py-1"
                     >
                       <option value="">--</option>
-                      <option value="Low">Low</option>
-                      <option value="Medium">Medium</option>
-                      <option value="High">High</option>
+                      <option className="text-green-700"value="Low">Low</option>
+                      <option className="text-green-700" value="Medium">Medium</option>
+                      <option className="text-green-700" value="High">High</option>
                     </select>
                   </td>
                   <td className="p-3">
@@ -442,6 +445,7 @@ export default function ManagerDashboard() {
     </div>
   );
 }
+
 
 
 

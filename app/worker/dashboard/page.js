@@ -219,6 +219,7 @@ import QRScanner from "@/components/QRScanner";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { signOut } from "next-auth/react";
+import toast from "react-hot-toast";
 
 export default function WorkerDashboard() {
   const { data: session, status } = useSession();
@@ -247,6 +248,7 @@ export default function WorkerDashboard() {
       );
     } catch (err) {
       console.error("Error fetching complaints:", err);
+      toast.error("Failed to fetch complaints.");
     } finally {
       setLoading(false);
     }
@@ -271,7 +273,7 @@ export default function WorkerDashboard() {
       const complaint = res.data;
 
       if (!complaint || complaint.status !== "in progress") {
-        alert("Invalid or already resolved complaint.");
+        toast.error("Invalid or already resolved complaint.");
         return;
       }
 
@@ -281,11 +283,11 @@ export default function WorkerDashboard() {
         priority: complaint.priority,
       });
 
-      alert("Complaint marked as resolved!");
+      toast.success("Complaint marked as resolved!");
       fetchComplaints();
     } catch (error) {
       console.error("QR Scan Error:", error);
-      alert("Failed to resolve complaint. Try again.");
+      toast.error("Failed to resolve complaint. Try again.");
     } finally {
       setShowScanner(false);
       setScanningComplaintId(null);
@@ -298,9 +300,11 @@ export default function WorkerDashboard() {
         id,
         status: "in progress",
       });
+      toast.success("Complaint accepted.");
       fetchComplaints();
     } catch (err) {
       console.error("Error accepting complaint:", err);
+      toast.error("Failed to accept complaint.");
     }
   };
 
@@ -333,7 +337,7 @@ export default function WorkerDashboard() {
         </div>
 
         {complaints.length === 0 ? (
-          <p className="text-gray-600">No complaints assigned yet.</p>
+          <p className="text-gray-600 text-lg">No new complaints.</p>
         ) : (
           <div className="space-y-6">
             <h2 className="text-2xl font-semibold text-green-800">
@@ -429,3 +433,4 @@ export default function WorkerDashboard() {
     </div>
   );
 }
+

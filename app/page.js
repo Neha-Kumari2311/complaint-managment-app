@@ -166,7 +166,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "@/lib/axios";
-import { FiUser, FiMail, FiLock, FiPhone, FiHome, FiBriefcase } from "react-icons/fi";
+import { toast } from "react-hot-toast";
+import {
+  FiUser,
+  FiMail,
+  FiLock,
+  FiPhone,
+  FiHome,
+  FiBriefcase,
+} from "react-icons/fi";
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
@@ -192,14 +200,14 @@ export default function RegisterPage() {
     try {
       const res = await axios.post("/api/auth/register", form);
       if (res.status === 200 || res.status === 201) {
-        alert("Registered successfully!");
+        toast.success("Registered successfully!");
         router.push("/login");
       } else {
-        alert("Registration failed.");
+        toast.error("Registration failed.");
       }
     } catch (error) {
       console.error("Registration Error:", error);
-      alert("Registration failed. Please try again.");
+      toast.error("Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -359,6 +367,7 @@ export default function RegisterPage() {
     </div>
   );
 }
+
 
 
 

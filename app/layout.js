@@ -1,5 +1,6 @@
 import "./styles/global.css"; // ✅ Correct path to your global styles
 import { Providers } from "./providers";
+import { Toaster } from 'react-hot-toast';
 
 export const metadata = {
   title: "🏠Resident Complaint System",
@@ -12,6 +13,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <Providers>{children}</Providers>
+        <Toaster position="top-right" reverseOrder={false} />
       </body>
     </html>
   );
