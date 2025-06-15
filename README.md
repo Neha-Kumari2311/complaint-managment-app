@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+# Resident Complaint Management System
 
-First, run the development server:
+A full-stack web application that enables residents to raise complaints, managers to assign and prioritize them, and workers to resolve issues using a token-based reward system.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend & Backend**: Next.js (App Router)
+- **Authentication**: NextAuth.js (Credentials Provider)
+- **Database**: MySQL using `mysql2/promise`
+- **Styling**: Tailwind CSS
+- **Utilities**: bcryptjs, uuid, html5-qrcode
+
+
+## 👥 User Roles and Features
+
+### 🏠 Resident
+- Register and login using Flat Number and Contact Number
+- Submit complaints with category, description, image
+- Get a unique complaint code and downloadable QR code
+- View all submitted complaints and delete if needed
+
+### 🧑‍💼 Manager
+- Login via email and password
+- View all submitted complaints
+- Assign to workers based on category
+- Set complaint priority (Low/Medium/High)
+
+### 👷 Worker
+- Login via email, password, and specialization
+- View assigned complaints (sorted by priority)
+- Accept and mark complaints as "In Progress"
+- Scan QR to mark as "Resolved"
+- Earn tokens per resolved complaint based on priority
+
+### 💰 Token System
+- Workers earn:
+  - 🟥 5 tokens for High
+  - 🟧 3 tokens for Medium
+  - 🟩 1 token for Low priority complaints
+- View Token Balance
+- Redeem Rewards 
+
+---
+## 🖼 Screenshots
+
+### Registration page
+![Register Form](public/Screenshot_register.png)
+
+### Login page
+![Login Form](public/Screenshot_login.png)
+
+### Resident Dashboard
+![Resident Dashboard](public/Screenshot_resident.png)
+
+### Manager Dashboard
+![Manager Dashboard](public/Screenshot_manager.png)
+
+### Worker Dashboard with QR Scan
+![Worker Dashboard](public/Screenshost_worker.png)
+
+
+
+## 📦 Installation
+
+### 1. Clone the repo
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+git clone https://github.com/Neha-Kumari2311/complaint-managment-app.git
+cd resident-complaint-app
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
