@@ -43,9 +43,14 @@ export default function RegisterPage() {
       }
     } catch (error) {
       console.error("Registration Error:", error);
-      toast.error("Registration failed. Please try again.");
-    } finally {
-      setLoading(false);
+
+      if (error.response?.status === 409) {
+        toast.error("User already exists!");
+      } else if (error.response?.status === 400) {
+        toast.error("Please fill all required fields.");
+      } else {
+        toast.error("Registration failed. Please try again.");
+      }
     }
   };
 
@@ -151,16 +156,36 @@ export default function RegisterPage() {
                 className="w-full outline-none bg-transparent"
               >
                 <option value="">-- Select Specialisation --</option>
-                <option className="text-[#9659d0]" value="Plumbing">Plumbing</option>
-                <option className="text-[#9659d0]" value="Electrical">Electrical</option>
-                <option className="text-[#9659d0]" value="Cleaning">Cleaning</option>
-                <option className="text-[#9659d0]" value="Carpentry">Carpentry</option>
-                <option className="text-[#9659d0]" value="Pest Control">Pest Control</option>
-                <option className="text-[#9659d0]" value="Painting">Painting</option>
-                <option className="text-[#9659d0]" value="HVAC">HVAC</option>
-                <option className="text-[#9659d0]" value="Gardening">Gardening</option>
-                <option className="text-[#9659d0]" value="Security">Security</option>
-                <option className="text-[#9659d0]" value="Other">Other</option>
+                <option className="text-[#9659d0]" value="Plumbing">
+                  Plumbing
+                </option>
+                <option className="text-[#9659d0]" value="Electrical">
+                  Electrical
+                </option>
+                <option className="text-[#9659d0]" value="Cleaning">
+                  Cleaning
+                </option>
+                <option className="text-[#9659d0]" value="Carpentry">
+                  Carpentry
+                </option>
+                <option className="text-[#9659d0]" value="Pest Control">
+                  Pest Control
+                </option>
+                <option className="text-[#9659d0]" value="Painting">
+                  Painting
+                </option>
+                <option className="text-[#9659d0]" value="HVAC">
+                  HVAC
+                </option>
+                <option className="text-[#9659d0]" value="Gardening">
+                  Gardening
+                </option>
+                <option className="text-[#9659d0]" value="Security">
+                  Security
+                </option>
+                <option className="text-[#9659d0]" value="Other">
+                  Other
+                </option>
               </select>
             </div>
           )}
@@ -203,11 +228,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-
-
-
-
-
-
-
-

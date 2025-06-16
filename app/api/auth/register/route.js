@@ -24,9 +24,19 @@ export async function POST(req) {
     }
 
     // Check if user already exists by email
-    const [existing] = await db.query(`SELECT * FROM users WHERE email = ?`, [
-      email,
-    ]);
+    let existing=[];
+     if (role === "resident") {
+       [existing] = await db.query(
+        `SELECT * FROM users WHERE flat_no = ? AND contact_no = ?`,
+        [flatNumber, contact]
+      );
+    } else {
+       [existing] = await db.query(
+        `SELECT * FROM users WHERE email = ?`,
+        [email]
+      );
+    }
+
     if (existing.length > 0) {
       return NextResponse.json(
         { message: "User already exists" },

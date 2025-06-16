@@ -12,12 +12,7 @@ export default function TokenDashboard() {
   const [loading, setLoading] = useState(true);
   const [selectedReward, setSelectedReward] = useState(null);
   const [redeemStatus, setRedeemStatus] = useState("");
-
-  const rewards = [
-    { name: "Gift Card ₹100", cost: 10 },
-    { name: "T-Shirt", cost: 20 },
-    { name: "Water Bottle", cost: 5 },
-  ];
+  const [rewards, setRewards] = useState([]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -26,8 +21,18 @@ export default function TokenDashboard() {
       router.push("/");
     } else {
       fetchBalance();
+      fetchRewards();
     }
   }, [status, session]);
+  const fetchRewards = async () => {
+    try {
+      const res = await axios.get("/api/rewards");
+      setRewards(res.data || []);
+    } catch (err) {
+      console.error("Error fetching rewards", err);
+      alert("Could not load rewards.");
+    }
+  };
 
   const fetchBalance = async () => {
     try {
@@ -52,7 +57,9 @@ export default function TokenDashboard() {
       return;
     }
 
-    const confirmed = confirm(`Redeem ${selectedReward.name} for ${selectedReward.cost} tokens?`);
+    const confirmed = confirm(
+      `Redeem ${selectedReward.name} for ${selectedReward.cost} tokens?`
+    );
     if (!confirmed) return;
 
     try {
@@ -80,9 +87,13 @@ export default function TokenDashboard() {
     <div className="min-h-screen flex items-center justify-center bg-yellow-50 p-4">
       <div className="bg-white shadow-md rounded-xl p-8 text-center max-w-md w-full">
         <h2 className="text-2xl font-bold text-yellow-700 mb-4">Your Tokens</h2>
-        <p className="text-4xl font-extrabold text-gray-800 mb-6">{tokenBalance} 🪙</p>
+        <p className="text-4xl font-extrabold text-gray-800 mb-6">
+          {tokenBalance} 🪙
+        </p>
 
-        <h3 className="text-lg font-semibold text-gray-700 mb-2">Available Rewards:</h3>
+        <h3 className="text-lg font-semibold text-gray-700 mb-2">
+          Available Rewards:
+        </h3>
         <ul className="space-y-2 mb-4">
           {rewards.map((reward) => (
             <li key={reward.name}>
@@ -112,12 +123,10 @@ export default function TokenDashboard() {
           Redeem Selected Reward
         </button>
 
-        {redeemStatus && <p className="mt-4 text-green-700 font-medium">{redeemStatus}</p>}
+        {redeemStatus && (
+          <p className="mt-4 text-green-700 font-medium">{redeemStatus}</p>
+        )}
       </div>
     </div>
   );
 }
-
-
-
-
