@@ -59,7 +59,7 @@ A full-stack web application that enables residents to raise complaints, manager
 ![Manager Dashboard](public/Screenshot_manager.png)
 
 ### Worker Dashboard with QR Scan
-![Worker Dashboard](public/Screenshost_worker.png)
+![Worker Dashboard](public/Screenshot_worker.png)
 
 
 
